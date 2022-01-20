@@ -1,2 +1,2 @@
 # backend
-Backend framework based on Golang
+Backend framework built with Golang
