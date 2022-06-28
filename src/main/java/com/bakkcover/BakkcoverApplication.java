@@ -1,4 +1,4 @@
-package com.bakkcover.bakkcover;
+package com.bakkcover;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
