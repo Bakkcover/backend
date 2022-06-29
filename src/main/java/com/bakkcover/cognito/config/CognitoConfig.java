@@ -15,13 +15,16 @@ public class CognitoConfig {
     @Value(value = "${aws.access-secret}")
     private String secretKey;
 
+    @Value(value = "${aws.default-region}")
+    private String defaultRegion;
+
     @Bean
     public AWSCognitoIdentityProvider cognitoClient() {
 
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
 
         return AWSCognitoIdentityProviderClientBuilder.standard()
-                .withCredentials(new AWSStaticCredentialsProvider(awsCreds)).withRegion("us-east-1")
+                .withCredentials(new AWSStaticCredentialsProvider(awsCreds)).withRegion(defaultRegion)
                 .build();
     }
 }
