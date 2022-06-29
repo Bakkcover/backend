@@ -1,7 +1,11 @@
 package com.bakkcover.cognito.controller;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,8 +49,11 @@ public class UserController {
     @Value(value = "${aws.cognito.clientId}")
     private String clientId;
 
+    @Value(value = "${aws.cognito.clientSecret}")
+    private String clientSecret;
+
     @PostMapping(path = "/sign-up")
-    public void signUp(@RequestBody  UserSignUpRequest userSignUpRequest) {
+    public void signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
 
         try {
 
@@ -82,21 +89,22 @@ public class UserController {
         }
     }
 
-
-
     @PostMapping(path = "/sign-in")
-    public @ResponseBody  UserSignInResponse signIn(
-            @RequestBody  UserSignInRequest userSignInRequest) {
+    public @ResponseBody UserSignInResponse signIn(
+            @RequestBody UserSignInRequest userSignInRequest) {
 
         UserSignInResponse userSignInResponse = new UserSignInResponse();
 
         final Map<String, String> authParams = new HashMap<>();
         authParams.put("USERNAME", userSignInRequest.getUsername());
         authParams.put("PASSWORD", userSignInRequest.getPassword());
+        authParams.put("SECRET_HASH", calculateSecretHash(clientId, clientSecret, userSignInRequest.getUsername()));
 
         final AdminInitiateAuthRequest authRequest = new AdminInitiateAuthRequest();
-        authRequest.withAuthFlow(AuthFlowType.ADMIN_NO_SRP_AUTH).withClientId(clientId)
-                .withUserPoolId(userPoolId).withAuthParameters(authParams);
+        authRequest.withAuthFlow(AuthFlowType.ADMIN_NO_SRP_AUTH)
+                .withClientId(clientId)
+                .withUserPoolId(userPoolId)
+                .withAuthParameters(authParams);
 
         try {
             AdminInitiateAuthResult result = cognitoClient.adminInitiateAuth(authRequest);
@@ -172,5 +180,21 @@ public class UserController {
         userDetail.setLastName("Buddy");
         userDetail.setEmail("testbuddy@tutotialsbuddy.com");
         return userDetail;
+    }
+    private static String calculateSecretHash(String userPoolClientId, String userPoolClientSecret, String userName) {
+        final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
+
+        SecretKeySpec signingKey = new SecretKeySpec(
+                userPoolClientSecret.getBytes(StandardCharsets.UTF_8),
+                HMAC_SHA256_ALGORITHM);
+        try {
+            Mac mac = Mac.getInstance(HMAC_SHA256_ALGORITHM);
+            mac.init(signingKey);
+            mac.update(userName.getBytes(StandardCharsets.UTF_8));
+            byte[] rawHmac = mac.doFinal(userPoolClientId.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(rawHmac);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while calculating ");
+        }
     }
 }
