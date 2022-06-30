@@ -173,14 +173,15 @@ public class UserController {
     }
 
     @GetMapping(path = "/detail")
-    public @ResponseBody  UserDetail getUserDetail() {
-
+    public @ResponseBody UserDetail getUserDetail() {
         UserDetail userDetail = new UserDetail();
         userDetail.setFirstName("Test");
         userDetail.setLastName("Buddy");
         userDetail.setEmail("testbuddy@tutotialsbuddy.com");
+
         return userDetail;
     }
+
     private static String calculateSecretHash(String userPoolClientId, String userPoolClientSecret, String userName) {
         final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
 
