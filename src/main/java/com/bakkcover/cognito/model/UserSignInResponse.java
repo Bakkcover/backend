@@ -7,6 +7,8 @@ public class UserSignInResponse {
     private String tokenType;
     private Integer expiresIn;
 
+    private String errorMessage;
+
     public String getAccessToken() {
         return accessToken;
     }
@@ -47,4 +49,11 @@ public class UserSignInResponse {
         this.expiresIn = expiresIn;
     }
 
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public String getErrorMessage() {
+        return this.errorMessage;
+    }
 }
