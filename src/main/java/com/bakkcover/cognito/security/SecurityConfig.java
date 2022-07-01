@@ -19,13 +19,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
+        // list of endpoints that do not require a JWT token in the authorization header
         List<String> permitAllEndpointList = Arrays.asList(SIGNUP_URL, SIGNIN_URL);
 
         http.cors().and().csrf().disable()
-                .authorizeRequests(expressionInterceptUrlRegistry -> expressionInterceptUrlRegistry
-                        .antMatchers(permitAllEndpointList
-                                .toArray(new String[permitAllEndpointList.size()]))
-                        .permitAll().anyRequest().authenticated())
+                .authorizeRequests(expressionInterceptUrlRegistry ->
+                        expressionInterceptUrlRegistry
+                            .antMatchers(permitAllEndpointList.toArray(new String[permitAllEndpointList.size()])).permitAll()
+                                .anyRequest().authenticated())
                 .oauth2ResourceServer().jwt();
     }
 }

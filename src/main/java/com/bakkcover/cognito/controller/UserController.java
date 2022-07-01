@@ -7,14 +7,12 @@ import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.bakkcover.cognito.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.AWSCognitoIdentityProviderException;
 import com.amazonaws.services.cognitoidp.model.AdminCreateUserRequest;
@@ -32,14 +30,14 @@ import com.amazonaws.services.cognitoidp.model.DeliveryMediumType;
 import com.amazonaws.services.cognitoidp.model.InvalidParameterException;
 import com.amazonaws.services.cognitoidp.model.MessageActionType;
 import com.bakkcover.cognito.exception.CustomException;
-import com.bakkcover.cognito.model.UserDetail;
-import com.bakkcover.cognito.model.UserSignInRequest;
-import com.bakkcover.cognito.model.UserSignInResponse;
-import com.bakkcover.cognito.model.UserSignUpRequest;
 
 @RestController
 @RequestMapping(path = "/api/users")
+@ResponseBody
 public class UserController {
+
+    // configured URL of frontend server on local
+    private final String LOCAL_ORIGIN = "http://localhost:4200";
 
     @Autowired
     private AWSCognitoIdentityProvider cognitoClient;
@@ -53,7 +51,11 @@ public class UserController {
     private String clientSecret;
 
     @PostMapping(path = "/sign-up")
-    public void signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
+    @CrossOrigin(origins = LOCAL_ORIGIN)
+    public ResponseEntity<UserSignUpResponse> signUp(
+            @RequestBody UserSignUpRequest userSignUpRequest) {
+
+        UserSignUpResponse userSignUpResponse = new UserSignUpResponse();
 
         try {
 
@@ -84,13 +86,28 @@ public class UserController {
 
         } catch (AWSCognitoIdentityProviderException e) {
             System.out.println(e.getErrorMessage());
+
+            userSignUpResponse.setErrorMessage(e.getErrorMessage());
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(userSignUpResponse);
         } catch (Exception e) {
             System.out.println("Setting user password");
+
+            userSignUpResponse.setErrorMessage("Setting user password");
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(userSignUpResponse);
         }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userSignUpResponse);
     }
 
     @PostMapping(path = "/sign-in")
-    public @ResponseBody UserSignInResponse signIn(
+    @CrossOrigin(origins = LOCAL_ORIGIN)
+    public ResponseEntity<UserSignInResponse> signIn(
             @RequestBody UserSignInRequest userSignInRequest) {
 
         UserSignInResponse userSignInResponse = new UserSignInResponse();
@@ -164,23 +181,39 @@ public class UserController {
 
         } catch (InvalidParameterException e) {
             throw new CustomException(e.getErrorMessage());
-        } catch (Exception e) {
-            throw new CustomException(e.getMessage());
-        }
-        cognitoClient.shutdown();
-        return userSignInResponse;
+        } catch (AWSCognitoIdentityProviderException e) {
+            userSignInResponse.setErrorMessage(e.getErrorMessage());
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(userSignInResponse);
 
+        } catch (Exception e) {
+            // throw new CustomException(e.getMessage());
+
+            userSignInResponse.setErrorMessage(e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(userSignInResponse);
+        }
+
+//        cognitoClient.shutdown();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userSignInResponse);
     }
 
     @GetMapping(path = "/detail")
-    public @ResponseBody  UserDetail getUserDetail() {
-
+    @CrossOrigin(origins = LOCAL_ORIGIN)
+    public @ResponseBody UserDetail getUserDetail() {
         UserDetail userDetail = new UserDetail();
         userDetail.setFirstName("Test");
         userDetail.setLastName("Buddy");
         userDetail.setEmail("testbuddy@tutotialsbuddy.com");
+
         return userDetail;
     }
+
     private static String calculateSecretHash(String userPoolClientId, String userPoolClientSecret, String userName) {
         final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
 
