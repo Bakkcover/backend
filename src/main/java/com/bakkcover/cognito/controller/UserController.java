@@ -9,12 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.AWSCognitoIdentityProviderException;
 import com.amazonaws.services.cognitoidp.model.AdminCreateUserRequest;
@@ -41,6 +36,9 @@ import com.bakkcover.cognito.model.UserSignUpRequest;
 @RequestMapping(path = "/api/users")
 public class UserController {
 
+    // configured URL of frontend server on local
+    private final String LOCAL_ORIGIN = "http://localhost:4200";
+
     @Autowired
     private AWSCognitoIdentityProvider cognitoClient;
 
@@ -53,6 +51,7 @@ public class UserController {
     private String clientSecret;
 
     @PostMapping(path = "/sign-up")
+    @CrossOrigin(origins = LOCAL_ORIGIN)
     public void signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
 
         try {
@@ -90,6 +89,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/sign-in")
+    @CrossOrigin(origins = LOCAL_ORIGIN)
     public @ResponseBody UserSignInResponse signIn(
             @RequestBody UserSignInRequest userSignInRequest) {
 
@@ -173,6 +173,7 @@ public class UserController {
     }
 
     @GetMapping(path = "/detail")
+    @CrossOrigin(origins = LOCAL_ORIGIN)
     public @ResponseBody UserDetail getUserDetail() {
         UserDetail userDetail = new UserDetail();
         userDetail.setFirstName("Test");
