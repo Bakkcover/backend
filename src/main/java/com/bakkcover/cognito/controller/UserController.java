@@ -167,9 +167,10 @@ public class UserController {
         } catch (Exception e) {
             throw new CustomException(e.getMessage());
         }
-        cognitoClient.shutdown();
-        return userSignInResponse;
 
+//        cognitoClient.shutdown();
+
+        return userSignInResponse;
     }
 
     @GetMapping(path = "/detail")
