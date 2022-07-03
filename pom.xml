@@ -47,6 +47,18 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- For database -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.4.0</version>
+		</dependency>
+
 		<!-- AWS Cognito -->
 		<dependency>
 			<groupId>com.amazonaws</groupId>
