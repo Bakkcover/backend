@@ -1,6 +1,6 @@
-package com.bakkcover.cognito.model;
+package com.bakkcover.user.dtos;
 
-public class UserDetail {
+public class UserDetailResponse {
 
     private String firstName;
     private String lastName;

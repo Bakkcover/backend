@@ -1,4 +1,4 @@
-package com.bakkcover.cognito.model;
+package com.bakkcover.user.dtos;
 
 public class UserSignInResponse {
     private String accessToken;

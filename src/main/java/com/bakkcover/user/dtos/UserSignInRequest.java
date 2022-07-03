@@ -1,9 +1,10 @@
-package com.bakkcover.cognito.model;
+package com.bakkcover.user.dtos;
 
-public class UserSignUpRequest {
+public class UserSignInRequest {
     private String username;
     private String email;
     private String password;
+    private String newPassword;
 
     public String getUsername() {
         return username;
@@ -27,6 +28,14 @@ public class UserSignUpRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 
 }

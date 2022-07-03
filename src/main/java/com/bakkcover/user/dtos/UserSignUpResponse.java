@@ -1,4 +1,4 @@
-package com.bakkcover.cognito.model;
+package com.bakkcover.user.dtos;
 
 public class UserSignUpResponse {
     private String email;

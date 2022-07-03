@@ -1,4 +1,4 @@
-package com.bakkcover.cognito.config;
+package com.bakkcover.user.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
