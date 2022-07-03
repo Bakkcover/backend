@@ -1,4 +1,4 @@
-package com.bakkcover.cognito.security;
+package com.bakkcover.shared.security;
 
 import java.util.Arrays;
 import java.util.List;

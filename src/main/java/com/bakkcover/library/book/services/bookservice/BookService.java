@@ -12,4 +12,6 @@ public interface BookService {
     List<Book> getBookByAuthor(String author);
 
     List<Book> getBookByPublisher(String publisher);
+
+    void addBook(String title, String author, String publisher, String details, String listedByUser);
 }

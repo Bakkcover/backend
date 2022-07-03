@@ -1,17 +1,20 @@
-package com.bakkcover.cognito.controller;
+package com.bakkcover.user;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.bakkcover.cognito.model.*;
+import com.bakkcover.user.dtos.*;
+import com.bakkcover.user.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.AWSCognitoIdentityProviderException;
@@ -29,18 +32,16 @@ import com.amazonaws.services.cognitoidp.model.ChallengeNameType;
 import com.amazonaws.services.cognitoidp.model.DeliveryMediumType;
 import com.amazonaws.services.cognitoidp.model.InvalidParameterException;
 import com.amazonaws.services.cognitoidp.model.MessageActionType;
-import com.bakkcover.cognito.exception.CustomException;
+import com.bakkcover.user.exceptions.CustomException;
 
 @RestController
 @RequestMapping(path = "/api/users")
+@CrossOrigin(origins = "${local.angular.uri}")
 @ResponseBody
 public class UserController {
 
-    // configured URL of frontend server on local
-    private final String LOCAL_ORIGIN = "http://localhost:4200";
-
-    @Autowired
     private AWSCognitoIdentityProvider cognitoClient;
+    private UserService userService;
 
     @Value(value = "${aws.cognito.userPoolId}")
     private String userPoolId;
@@ -50,8 +51,13 @@ public class UserController {
     @Value(value = "${aws.cognito.clientSecret}")
     private String clientSecret;
 
+    @Autowired
+    public UserController(AWSCognitoIdentityProvider cognitoClient, UserService userService) {
+        this.cognitoClient = cognitoClient;
+        this.userService = userService;
+    }
+
     @PostMapping(path = "/sign-up")
-    @CrossOrigin(origins = LOCAL_ORIGIN)
     public ResponseEntity<UserSignUpResponse> signUp(
             @RequestBody UserSignUpRequest userSignUpRequest) {
 
@@ -106,7 +112,6 @@ public class UserController {
     }
 
     @PostMapping(path = "/sign-in")
-    @CrossOrigin(origins = LOCAL_ORIGIN)
     public ResponseEntity<UserSignInResponse> signIn(
             @RequestBody UserSignInRequest userSignInRequest) {
 
@@ -204,12 +209,13 @@ public class UserController {
     }
 
     @GetMapping(path = "/detail")
-    @CrossOrigin(origins = LOCAL_ORIGIN)
-    public @ResponseBody UserDetail getUserDetail() {
-        UserDetail userDetail = new UserDetail();
+    public @ResponseBody UserDetailResponse getUserDetail(Authentication authentication) {
+        UserDetailResponse userDetail = new UserDetailResponse();
         userDetail.setFirstName("Test");
         userDetail.setLastName("Buddy");
         userDetail.setEmail("testbuddy@tutotialsbuddy.com");
+
+        System.out.println(this.userService.getCognitoSub(authentication));
 
         return userDetail;
     }
