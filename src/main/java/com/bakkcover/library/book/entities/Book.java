@@ -1,5 +1,7 @@
 package com.bakkcover.library.book.entities;
 
+import com.bakkcover.user.entities.User;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -21,12 +23,12 @@ public class Book {
     @Column(columnDefinition="TEXT")
     private String details;
 
-    // this attribute refers to the attribute "sub" that uniquely identifies a user in a Cognito User-Pool
-    private String listedByUser;
+    @ManyToOne
+    private User listedByUser;
 
     public Book() { }
 
-    public Book(String title, String author, String publisher, String details, String listedByUser) {
+    public Book(String title, String author, String publisher, String details, User listedByUser) {
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -66,11 +68,11 @@ public class Book {
         this.details = details;
     }
 
-    public String getListedByUser() {
+    public User getListedByUser() {
         return listedByUser;
     }
 
-    public void setListedByUser(String listedByUser) {
+    public void setListedByUser(User listedByUser) {
         this.listedByUser = listedByUser;
     }
 

@@ -4,6 +4,7 @@ import com.bakkcover.library.book.dto.AddBookRequest;
 import com.bakkcover.library.book.dto.GetBooksResponse;
 import com.bakkcover.library.book.entities.Book;
 import com.bakkcover.library.book.services.bookservice.BookService;
+import com.bakkcover.user.entities.User;
 import com.bakkcover.user.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/books")
-@CrossOrigin(origins = "${local.angular.uri}")
+@CrossOrigin(origins = "http://localhost:4200")
 public class BookController {
     private final BookService bookService;
     private final UserService userService;
@@ -54,7 +55,7 @@ public class BookController {
             String author = addBookRequest.getAuthor();
             String publisher = addBookRequest.getPublisher();
             String details = addBookRequest.getDetails();
-            String user = this.userService.getCognitoSub(authentication);
+            User user = this.userService.getUser(authentication);
 
             bookService.addBook(title, author, publisher, details, user);
         } catch (Exception e) {
