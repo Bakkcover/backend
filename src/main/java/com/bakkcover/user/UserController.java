@@ -8,7 +8,9 @@ import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.amazonaws.services.cognitoidp.model.*;
 import com.bakkcover.user.dtos.*;
+import com.bakkcover.user.entities.User;
 import com.bakkcover.user.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,21 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
-import com.amazonaws.services.cognitoidp.model.AWSCognitoIdentityProviderException;
-import com.amazonaws.services.cognitoidp.model.AdminCreateUserRequest;
-import com.amazonaws.services.cognitoidp.model.AdminCreateUserResult;
-import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
-import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
-import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeRequest;
-import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeResult;
-import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordRequest;
-import com.amazonaws.services.cognitoidp.model.AttributeType;
-import com.amazonaws.services.cognitoidp.model.AuthFlowType;
-import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
-import com.amazonaws.services.cognitoidp.model.ChallengeNameType;
-import com.amazonaws.services.cognitoidp.model.DeliveryMediumType;
-import com.amazonaws.services.cognitoidp.model.InvalidParameterException;
-import com.amazonaws.services.cognitoidp.model.MessageActionType;
 import com.bakkcover.user.exceptions.CustomException;
 
 @RestController
@@ -67,40 +54,29 @@ public class UserController {
 
             AttributeType emailAttr =
                     new AttributeType().withName("email").withValue(userSignUpRequest.getEmail());
-            AttributeType emailVerifiedAttr =
-                    new AttributeType().withName("email_verified").withValue("true");
 
-            AdminCreateUserRequest userRequest = new AdminCreateUserRequest()
-                    .withUserPoolId(userPoolId).withUsername(userSignUpRequest.getUsername())
-                    .withTemporaryPassword(userSignUpRequest.getPassword())
-                    .withUserAttributes(emailAttr, emailVerifiedAttr)
-                    .withMessageAction(MessageActionType.SUPPRESS)
-                    .withDesiredDeliveryMediums(DeliveryMediumType.EMAIL);
+            SignUpRequest signUpRequest = new SignUpRequest()
+                    .withUserAttributes(emailAttr)
+                    .withUsername(userSignUpRequest.getUsername())
+                    .withClientId(clientId)
+                    .withPassword(userSignUpRequest.getPassword())
+                    .withSecretHash(calculateSecretHash(clientId, clientSecret, userSignUpRequest.getUsername()));
 
-            AdminCreateUserResult createUserResult = cognitoClient.adminCreateUser(userRequest);
+            SignUpResult signUpResult = cognitoClient.signUp(signUpRequest);
 
-            System.out.println("User " + createUserResult.getUser().getUsername()
-                    + " is created. Status: " + createUserResult.getUser().getUserStatus());
-
-            // Disable force change password during first login
-            AdminSetUserPasswordRequest adminSetUserPasswordRequest =
-                    new AdminSetUserPasswordRequest().withUsername(userSignUpRequest.getUsername())
-                            .withUserPoolId(userPoolId)
-                            .withPassword(userSignUpRequest.getPassword()).withPermanent(true);
-
-            cognitoClient.adminSetUserPassword(adminSetUserPasswordRequest);
+            System.out.println("User " + signUpResult.getUserSub()
+                    + " is created. Is user confirmed: " + signUpResult.isUserConfirmed());
 
         } catch (AWSCognitoIdentityProviderException e) {
             System.out.println(e.getErrorMessage());
-
             userSignUpResponse.setErrorMessage(e.getErrorMessage());
+
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(userSignUpResponse);
         } catch (Exception e) {
-            System.out.println("Setting user password");
+            userSignUpResponse.setErrorMessage(e.getMessage());
 
-            userSignUpResponse.setErrorMessage("Setting user password");
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(userSignUpResponse);
@@ -209,15 +185,26 @@ public class UserController {
     }
 
     @GetMapping(path = "/detail")
-    public @ResponseBody UserDetailResponse getUserDetail(Authentication authentication) {
+    public ResponseEntity<UserDetailResponse> getUserDetail(Authentication authentication) {
         UserDetailResponse userDetail = new UserDetailResponse();
-        userDetail.setFirstName("Test");
-        userDetail.setLastName("Buddy");
-        userDetail.setEmail("testbuddy@tutotialsbuddy.com");
 
-        System.out.println(this.userService.getCognitoSub(authentication));
+        // userDetail.setFirstName("Test");
+        // userDetail.setLastName("Buddy");
+        // userDetail.setEmail("testbuddy@tutotialsbuddy.com");
 
-        return userDetail;
+        // String sub = this.userService.getCognitoSub(authentication);
+        // System.out.println(sub);
+
+        try {
+            User user = this.userService.getUser(authentication);
+            userDetail.setUser(user);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userDetail);
     }
 
     private static String calculateSecretHash(String userPoolClientId, String userPoolClientSecret, String userName) {
