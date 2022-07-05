@@ -2,6 +2,7 @@ package com.bakkcover.library.book.services.bookservice;
 
 import com.bakkcover.library.book.repositories.BookRepository;
 import com.bakkcover.library.book.entities.Book;
+import com.bakkcover.user.entities.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void addBook(String title, String author, String publisher, String details, String listedByUser) {
+    public void addBook(String title, String author, String publisher, String details, User listedByUser) {
         bookRepository.save(new Book(title, author, publisher, details, listedByUser));
     }
 }

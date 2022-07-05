@@ -23,7 +23,7 @@ import com.bakkcover.user.exceptions.CustomException;
 
 @RestController
 @RequestMapping(path = "/api/users")
-@CrossOrigin(origins = "${local.angular.uri}")
+@CrossOrigin(origins = "http://localhost:4200")
 @ResponseBody
 public class UserController {
 
@@ -150,7 +150,7 @@ public class UserController {
                 }
             } else {
 
-                System.out.println("User has no challenge");
+                System.out.println("User successfully authenticated!");
                 authenticationResult = result.getAuthenticationResult();
 
                 userSignInResponse.setAccessToken(authenticationResult.getAccessToken());
