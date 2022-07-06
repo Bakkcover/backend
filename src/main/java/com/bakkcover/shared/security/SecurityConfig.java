@@ -17,11 +17,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String SIGNIN_URL = "/api/users/sign-in";
     public static final String LISTBOOKS_URL = "/api/books/all";
 
+    public static final String GETBOOK_URL = "/api/book";
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         // list of endpoints that do not require a JWT token in the authorization header
-        List<String> permitAllEndpointList = Arrays.asList(SIGNUP_URL, SIGNIN_URL, LISTBOOKS_URL);
+        List<String> permitAllEndpointList = Arrays.asList(SIGNUP_URL, SIGNIN_URL, LISTBOOKS_URL, GETBOOK_URL);
 
         http.cors().and().csrf().disable()
                 .authorizeRequests(expressionInterceptUrlRegistry ->

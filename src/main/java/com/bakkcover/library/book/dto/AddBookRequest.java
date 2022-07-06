@@ -1,10 +1,10 @@
 package com.bakkcover.library.book.dto;
 
 public class AddBookRequest {
-    String title;
-    String author;
-    String publisher;
-    String details;
+    private String title;
+    private String author;
+    private String publisher;
+    private String details;
 
     public String getTitle() {
         return title;

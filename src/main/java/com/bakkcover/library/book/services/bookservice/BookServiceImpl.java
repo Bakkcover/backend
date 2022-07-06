@@ -1,11 +1,13 @@
 package com.bakkcover.library.book.services.bookservice;
 
+import com.bakkcover.library.book.exceptions.BookNotFoundException;
 import com.bakkcover.library.book.repositories.BookRepository;
 import com.bakkcover.library.book.entities.Book;
 import com.bakkcover.user.entities.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -13,6 +15,17 @@ public class BookServiceImpl implements BookService {
 
     public BookServiceImpl(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
+    }
+
+    @Override
+    public Book getBookById(Long id) throws BookNotFoundException {
+        Optional<Book> book = bookRepository.findById(id);
+
+        if (!book.isPresent()) {
+            throw new BookNotFoundException();
+        }
+
+        return book.get();
     }
 
     @Override

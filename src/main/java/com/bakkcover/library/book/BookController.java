@@ -1,9 +1,8 @@
 package com.bakkcover.library.book;
 
-import com.bakkcover.library.book.dto.AddBookRequest;
-import com.bakkcover.library.book.dto.AddBookResponse;
-import com.bakkcover.library.book.dto.GetBooksResponse;
+import com.bakkcover.library.book.dto.*;
 import com.bakkcover.library.book.entities.Book;
+import com.bakkcover.library.book.exceptions.BookNotFoundException;
 import com.bakkcover.library.book.services.bookservice.BookService;
 import com.bakkcover.user.entities.User;
 import com.bakkcover.user.services.UserService;
@@ -46,6 +45,23 @@ public class BookController {
                 .status(HttpStatus.OK)
                 .body(getBooksResponse);
     }
+
+    @GetMapping("/book")
+    public ResponseEntity<GetBookResponse> getBook(@RequestBody GetBookRequest request) {
+        GetBookResponse getBookResponse = new GetBookResponse();
+
+        try {
+            Book book = this.bookService.getBookById(request.getId());
+            getBookResponse.setBook(book);
+        } catch (BookNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(getBookResponse);
+    }
+
 
     @PostMapping("/add")
     public ResponseEntity<AddBookResponse> addBook(
