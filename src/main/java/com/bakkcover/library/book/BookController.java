@@ -1,6 +1,7 @@
 package com.bakkcover.library.book;
 
 import com.bakkcover.library.book.dto.AddBookRequest;
+import com.bakkcover.library.book.dto.AddBookResponse;
 import com.bakkcover.library.book.dto.GetBooksResponse;
 import com.bakkcover.library.book.entities.Book;
 import com.bakkcover.library.book.services.bookservice.BookService;
@@ -29,6 +30,7 @@ public class BookController {
 
     @GetMapping("/all")
     public ResponseEntity<GetBooksResponse> getAllBooks() {
+
         GetBooksResponse getBooksResponse = new GetBooksResponse();
 
         try {
@@ -46,10 +48,14 @@ public class BookController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addBook(
+    public ResponseEntity<AddBookResponse> addBook(
             @RequestBody
             AddBookRequest addBookRequest,
             Authentication authentication) {
+        String SUCCESS_MESSAGE = "Successfully added book";
+
+        AddBookResponse addBookResponse = new AddBookResponse();
+
         try {
             String title = addBookRequest.getTitle();
             String author = addBookRequest.getAuthor();
@@ -58,14 +64,18 @@ public class BookController {
             User user = this.userService.getUser(authentication);
 
             bookService.addBook(title, author, publisher, details, user);
+
+            addBookResponse.setMessage(SUCCESS_MESSAGE);
         } catch (Exception e) {
+            addBookResponse.setMessage(e.getMessage());
+
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(e.getMessage());
+                    .body(addBookResponse);
         }
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("Book successfully added!");
+                .body(addBookResponse);
     }
 }

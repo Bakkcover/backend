@@ -4,6 +4,7 @@ public class AddBookRequest {
     String title;
     String author;
     String publisher;
+    String details;
 
     public String getTitle() {
         return title;
@@ -36,6 +37,4 @@ public class AddBookRequest {
     public void setDetails(String details) {
         this.details = details;
     }
-
-    String details;
 }
