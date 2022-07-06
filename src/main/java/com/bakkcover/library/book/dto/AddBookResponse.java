@@ -1,7 +1,7 @@
 package com.bakkcover.library.book.dto;
 
 public class AddBookResponse {
-    public String message;
+    private String message;
 
     public String getMessage() {
         return message;
