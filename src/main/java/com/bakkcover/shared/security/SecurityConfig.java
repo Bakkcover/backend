@@ -25,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // list of endpoints that do not require a JWT token in the authorization header
         List<String> permitAllEndpointList = Arrays.asList(SIGNUP_URL, SIGNIN_URL, LISTBOOKS_URL, GETBOOK_URL);
 
-        http.csrf().disable()
+        http.cors().and().csrf().disable()
                 .authorizeRequests(expressionInterceptUrlRegistry ->
                         expressionInterceptUrlRegistry
                             .antMatchers(permitAllEndpointList.toArray(new String[permitAllEndpointList.size()])).permitAll()
