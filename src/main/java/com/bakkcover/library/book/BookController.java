@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/books")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200", "http://bakkcover.s3-website-ap-southeast-1.amazonaws.com"})
 public class BookController {
     private final BookService bookService;
     private final UserService userService;
@@ -47,11 +47,11 @@ public class BookController {
     }
 
     @GetMapping("/book")
-    public ResponseEntity<GetBookResponse> getBook(@RequestBody GetBookRequest request) {
+    public ResponseEntity<GetBookResponse> getBook(@RequestParam Long id) {
         GetBookResponse getBookResponse = new GetBookResponse();
 
         try {
-            Book book = this.bookService.getBookById(request.getId());
+            Book book = this.bookService.getBookById(id);
             getBookResponse.setBook(book);
         } catch (BookNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
