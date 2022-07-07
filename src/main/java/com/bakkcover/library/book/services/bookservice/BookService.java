@@ -1,6 +1,7 @@
 package com.bakkcover.library.book.services.bookservice;
 
 import com.bakkcover.library.book.entities.Book;
+import com.bakkcover.library.book.exceptions.BookAlreadyAdoptedException;
 import com.bakkcover.library.book.exceptions.BookNotFoundException;
 import com.bakkcover.user.entities.User;
 
@@ -19,4 +20,6 @@ public interface BookService {
     List<Book> getBookByPublisher(String publisher);
 
     void addBook(String title, String author, String publisher, String details, User listedByUser);
+
+    void adoptBook(Long id, User user) throws BookNotFoundException, BookAlreadyAdoptedException;
 }

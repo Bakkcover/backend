@@ -2,6 +2,7 @@ package com.bakkcover.library.book;
 
 import com.bakkcover.library.book.dto.*;
 import com.bakkcover.library.book.entities.Book;
+import com.bakkcover.library.book.exceptions.BookAlreadyAdoptedException;
 import com.bakkcover.library.book.exceptions.BookNotFoundException;
 import com.bakkcover.library.book.services.bookservice.BookService;
 import com.bakkcover.user.entities.User;
@@ -62,6 +63,26 @@ public class BookController {
                 .body(getBookResponse);
     }
 
+    @GetMapping("/adopt")
+    public ResponseEntity<AdoptBookResponse> adoptBook(@RequestParam Long id, Authentication authentication) {
+        String SUCCESS_MESSAGE = "Successfully adopted book";
+
+        AdoptBookResponse adoptBookResponse = new AdoptBookResponse();
+
+        try {
+            User user = this.userService.getUser(authentication);
+            this.bookService.adoptBook(id, user);
+            adoptBookResponse.setMessage(SUCCESS_MESSAGE);
+        } catch (BookNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (BookAlreadyAdoptedException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(adoptBookResponse);
+    }
 
     @PostMapping("/add")
     public ResponseEntity<AddBookResponse> addBook(

@@ -26,6 +26,9 @@ public class Book {
     @ManyToOne
     private User listedByUser;
 
+    @ManyToOne
+    private User adoptedByUser;
+
     public Book() { }
 
     public Book(String title, String author, String publisher, String details, User listedByUser) {
@@ -78,6 +81,14 @@ public class Book {
 
     public void setListedByUser(User listedByUser) {
         this.listedByUser = listedByUser;
+    }
+
+    public User getAdoptedByUser() {
+        return adoptedByUser;
+    }
+
+    public void setAdoptedByUser(User adoptedByUser) {
+        this.adoptedByUser = adoptedByUser;
     }
 
     @Override

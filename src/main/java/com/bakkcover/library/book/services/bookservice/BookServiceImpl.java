@@ -1,5 +1,6 @@
 package com.bakkcover.library.book.services.bookservice;
 
+import com.bakkcover.library.book.exceptions.BookAlreadyAdoptedException;
 import com.bakkcover.library.book.exceptions.BookNotFoundException;
 import com.bakkcover.library.book.repositories.BookRepository;
 import com.bakkcover.library.book.entities.Book;
@@ -51,5 +52,18 @@ public class BookServiceImpl implements BookService {
     @Override
     public void addBook(String title, String author, String publisher, String details, User listedByUser) {
         bookRepository.save(new Book(title, author, publisher, details, listedByUser));
+    }
+
+    @Override
+    public void adoptBook(Long id, User adoptedByUser) throws BookNotFoundException, BookAlreadyAdoptedException {
+        Book book = getBookById(id);
+
+        if (book.getAdoptedByUser() != null) {
+            throw new BookAlreadyAdoptedException();
+        }
+
+        book.setAdoptedByUser(adoptedByUser);
+
+        bookRepository.save(book);
     }
 }
