@@ -23,7 +23,7 @@ import com.bakkcover.user.exceptions.CustomException;
 
 @RestController
 @RequestMapping(path = "/api/users")
-@CrossOrigin(origins = {"http://localhost:4200", "http://bakkcover.s3-website-ap-southeast-1.amazonaws.com"})
+// @CrossOrigin(origins = {"http://localhost:4200", "http://bakkcover.s3-website-ap-southeast-1.amazonaws.com"})
 @ResponseBody
 public class UserController {
 

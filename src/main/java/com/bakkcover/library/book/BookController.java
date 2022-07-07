@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/books")
-@CrossOrigin(origins = {"http://localhost:4200", "http://bakkcover.s3-website-ap-southeast-1.amazonaws.com"})
+// @CrossOrigin(origins = {"http://localhost:4200", "http://bakkcover.s3-website-ap-southeast-1.amazonaws.com"})
 public class BookController {
     private final BookService bookService;
     private final UserService userService;
