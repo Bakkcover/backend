@@ -1,0 +1,13 @@
+package com.bakkcover.library.book.dto;
+
+public class AdoptBookResponse {
+    private String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}
